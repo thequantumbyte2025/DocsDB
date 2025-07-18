@@ -1,0 +1,175 @@
+
+openapi: 3.0.3
+info:
+  title: Go Document API
+  version: 1.0.0
+  description: API RESTful para manejar documentos con autenticación JWT
+servers:
+  - url: http://localhost:8080
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        subtitle:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        content:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+
+paths:
+  /login:
+    post:
+      summary: Autenticación de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Token generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /documents:
+    post:
+      summary: Crear documento
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+      responses:
+        '201':
+          description: Documento creado
+    get:
+      summary: Obtener todos los documentos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de documentos
+
+  /documents/{id}:
+    get:
+      summary: Obtener documento por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Documento encontrado
+    put:
+      summary: Actualizar documento
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+      responses:
+        '200':
+          description: Documento actualizado
+    delete:
+      summary: Eliminar documento
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Eliminado correctamente
+
+  /search/keywords:
+    get:
+      summary: Buscar documentos por palabra clave
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: term
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resultados de búsqueda
+
+  /search/title:
+    get:
+      summary: Buscar documentos por título
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: term
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resultados de búsqueda
+
+  /search/subtitle:
+    get:
+      summary: Buscar documentos por subtítulo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: term
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resultados de búsqueda
